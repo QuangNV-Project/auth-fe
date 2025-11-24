@@ -1,0 +1,8 @@
+node_modules/
+build/
+.husky/
+.vscode/
+.idea/
+dist
+.git
+.DS_Store
