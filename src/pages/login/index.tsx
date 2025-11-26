@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link, useSearch } from '@tanstack/react-router'
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google'
 import { LoginMutationResponse } from '@/api/actions/auth/auth.types'
 import { authStore } from '@/stores/authStore'
@@ -22,9 +22,8 @@ import { useCallback } from 'react'
 import { ErrorHandler } from '@/utils/errorHandler'
 
 export const LoginPage = () => {
+  const { from } = useSearch({ strict: false });
   const { setAuthData } = authStore()
-
-  // Setup form with Zod validation
   const {
     register,
     handleSubmit,
@@ -42,7 +41,6 @@ export const LoginPage = () => {
       role: res.role,
       token: res.token,
     })
-
     toast.success('Login success')
   }
 

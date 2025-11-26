@@ -9,8 +9,7 @@ pipeline {
         ENV_DEV_ID  = 'env-file-react-dev'
         ENV_PROD_ID = 'env-file-react-prod'
         
-        // Docker image dùng để build (nên chọn version Node giống máy dev của bạn)
-        NODE_IMAGE      = 'node:18-alpine'
+        NODE_IMAGE      = 'node:24-alpine'
         // ==================================================
     }
 
@@ -39,7 +38,6 @@ pipeline {
                         }
                     }
 
-                    // Xóa file .env sau khi build xong để tránh lộ bí mật
                     sh 'rm .env'
 
                     // 2. Deploy sang Server Dev
@@ -96,6 +94,12 @@ pipeline {
                 }
             }
         }
+
+        stage('Reload') {
+            steps {
+                sh 'sudo nginx -s reload'
+            }
+        }
     }
 
     post {
@@ -111,7 +115,7 @@ pipeline {
 }
 
 // ===================================================================================
-// HÀM DEPLOY LOGIC (Rsync file tĩnh sang server)
+// HÀM DEPLOY LOGIC
 // ===================================================================================
 def deployReactApp(targetDir) {
     // 1. Đảm bảo thư mục đích tồn tại
@@ -119,16 +123,7 @@ def deployReactApp(targetDir) {
         ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} 'mkdir -p ${targetDir}'
     """
 
-    // 2. Rsync toàn bộ nội dung trong thư mục build/ sang server
-    // Dấu / sau BUILD_OUTPUT_DIR cực kỳ quan trọng:
-    // build/  -> copy nội dung bên trong thư mục build
-    // build   -> copy cả thư mục build (tạo ra /var/www/react-app/build/index.html -> SAI)
     sh """
         rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} -p ${REMOTE_PORT}" ./${BUILD_OUTPUT_DIR}/ ${REMOTE_USER}@${REMOTE_HOST}:${targetDir}/
     """
-    
-    // (Tùy chọn) Set lại quyền sở hữu file trên server nếu cần (để Nginx đọc được)
-    // sh """
-    //     ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} 'sudo chown -R www-data:www-data ${targetDir}'
-    // """
 }
