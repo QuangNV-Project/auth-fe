@@ -23,7 +23,7 @@ export class ApiError extends Error implements StandardizedApiError {
   statusCode: number
   timestamp: Date
   data: unknown | null
-  errors: string[]
+  errors: object
 
   constructor(message: string, statusCode: number = 0, standardizedError?: StandardizedApiError) {
     super(message)
@@ -31,25 +31,7 @@ export class ApiError extends Error implements StandardizedApiError {
     this.statusCode = statusCode
     this.timestamp = standardizedError?.timestamp || new Date()
     this.data = standardizedError?.data || null
-    this.errors = standardizedError?.errors || []
-  }
-
-  // Helper method to get user-friendly error message
-  getUserMessage(): string {
-    if (this.errors && this.errors.length > 0) {
-      return this.errors.join(', ')
-    }
-    return this.message
-  }
-
-  // Helper method to check if error is validation error
-  isValidationError(): boolean {
-    return this.statusCode === 422 && this.errors && this.errors.length > 0
-  }
-
-  // Helper method to check if error requires re-authentication
-  isAuthError(): boolean {
-    return this.statusCode === 401
+    this.errors = standardizedError?.errors || {}
   }
 }
 
@@ -79,7 +61,7 @@ axiosClient.interceptors.request.use((config: any) => {
 axiosClient.interceptors.response.use(
   (response: AxiosResponse) => {
     const payload = response.data
-    return payload
+    return payload.data
   },
   (error: AxiosError<ApiErrorResponse>) => {
     // Network or server errors
@@ -97,43 +79,7 @@ axiosClient.interceptors.response.use(
       timestamp: new Date(),
     }
 
-    // Handle different HTTP status codes
-    let userFriendlyMessage = standardizedError.message
-
-    switch (status) {
-      case 400:
-        userFriendlyMessage = errorData?.message || 'Invalid request. Please check your input.'
-        break
-      case 401:
-        userFriendlyMessage = 'Authentication failed. Please login again.'
-        break
-      case 403:
-        userFriendlyMessage = 'Access denied. You don\'t have permission to perform this action.'
-        break
-      case 404:
-        userFriendlyMessage = 'Resource not found.'
-        break
-      case 422:
-        // Validation errors - combine all error messages
-        if (errorData?.errors && Array.isArray(errorData.errors)) {
-          userFriendlyMessage = errorData.errors.join(', ')
-        } else {
-          userFriendlyMessage = errorData?.message || 'Validation failed.'
-        }
-        break
-      case 429:
-        userFriendlyMessage = 'Too many requests. Please try again later.'
-        break
-      case 500:
-        userFriendlyMessage = 'Server error. Please try again later.'
-        break
-      default:
-        if (error.code === 'NETWORK_ERROR' || !navigator.onLine) {
-          userFriendlyMessage = 'Network error. Please check your connection.'
-        }
-    }
-
-    const apiErr = new ApiError(userFriendlyMessage, status, standardizedError)
+    const apiErr = new ApiError(standardizedError.message, status, standardizedError)
     return Promise.reject(apiErr)
   }
 )

@@ -16,22 +16,21 @@ interface AuthServiceType {
 
 export const AuthService: AuthServiceType = {
     handleLogin: async function (data: LoginMutationArguments): Promise<LoginMutationResponse> {
-        const payload = await apiRequest<LoginMutationResponse>({
+        const res = await apiRequest<LoginMutationResponse>({
             method: API_METHOD.POST,
             url: `${AUTH_API_BASE_URL}/auth/login`,
             data,
         })
-
-        return payload
+        return res
     },
 
     handleRegister: async function (data: RegisterMutationArguments): Promise<RegisterMutationResponse> {
-        const payload = await apiRequest<RegisterMutationResponse>({
+        const res = await apiRequest<RegisterMutationResponse>({
             method: API_METHOD.POST,
             url: `${AUTH_API_BASE_URL}/auth/register`,
             data,
         })
 
-        return payload
+        return res
     },
 }

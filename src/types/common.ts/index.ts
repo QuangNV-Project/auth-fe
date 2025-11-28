@@ -10,3 +10,11 @@ export interface StandardizedApiError extends ApiErrorResponse {
   statusCode: number
   timestamp: Date
 }
+
+export type ApiResponse<T> = {
+  success: true
+  message: string
+  data: T | null
+  statusCode: number
+  timestamp: Date
+}

@@ -10,8 +10,6 @@ import {
 import { Label } from '@/components/ui/label'
 import { Link, useSearch } from '@tanstack/react-router'
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google'
-import { LoginMutationResponse } from '@/api/actions/auth/auth.types'
-import { authStore } from '@/stores/authStore'
 import { toast } from 'react-toastify'
 import { Input } from '@/components/ui/input'
 import { useForm } from 'react-hook-form'
@@ -19,11 +17,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, LoginFormData } from '@/schema/loginSchema'
 import { useLoginMutation } from '@/api/actions/auth/auth.mutations'
 import { useCallback } from 'react'
-import { ErrorHandler } from '@/utils/errorHandler'
+import { LoginMutationResponse } from '@/api/actions/auth/auth.types'
 
 export const LoginPage = () => {
-  const { from } = useSearch({ strict: false });
-  const { setAuthData } = authStore()
+  const { redirectTo, state } = useSearch({
+    strict: false,
+  });
   const {
     register,
     handleSubmit,
@@ -33,35 +32,19 @@ export const LoginPage = () => {
     mode: 'onChange',
   })
 
-  const handleLoginSuccess = (res: LoginMutationResponse) => {
-    setAuthData({
-      isAuthenticated: true,
-      userId: res.userId,
-      email: res.email,
-      role: res.role,
-      token: res.token,
-    })
-    toast.success('Login success')
-  }
-
   const { mutateAsync: credentialLoginMutation } = useLoginMutation()
 
   const handleLogin = useCallback(async (data: LoginFormData) => {
-    try {
-      const result = await credentialLoginMutation({
-        userName: data.username,
-        password: data.password,
-      })
-
-      handleLoginSuccess(result)
-    } catch (error: any) {
-      if (ErrorHandler.isAuthError(error)) {
-        toast.error('Invalid credentials. Please check your username and password.')
-      } else {
-        ErrorHandler.showError(error, 'Login failed. Please try again.')
-      }
-    }
-  }, [credentialLoginMutation, handleLoginSuccess])
+    await credentialLoginMutation({
+      userName: data.username,
+      password: data.password,
+      redirectTo,
+      state
+    }, {onSuccess: (res: LoginMutationResponse) => {
+      window.location.href = res.redirectTo+"/callback?code="+res.code+"&state="+res.state;
+      toast.success('Login successful')
+    }})
+  }, [credentialLoginMutation])
 
   const handleGoogleLogin = useCallback(async (_credentialResponse: CredentialResponse) => {
     toast.info('Google login is not implemented yet')

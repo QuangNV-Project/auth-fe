@@ -1,6 +1,8 @@
 export type LoginMutationArguments = {
   userName: string
   password: string
+  redirectTo: string
+  state: string
 }
 
 export type CredentialLoginMutationArguments = {
@@ -8,10 +10,9 @@ export type CredentialLoginMutationArguments = {
 }
 
 export type LoginMutationResponse = {
-  userId: string
-  email: string
-  role: string
-  token: string
+  code: string
+  redirectTo: string
+  state: string
 }
 
 export type GoogleLoginReturn = {

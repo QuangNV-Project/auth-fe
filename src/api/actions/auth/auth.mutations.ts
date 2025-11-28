@@ -18,14 +18,17 @@ export const useLoginMutation = (): UseMutationResult<LoginMutationResponse, Sta
     mutationFn: AuthService.handleLogin,
     onError: (errors: StandardizedApiError) => {
       toast.error(errors.message);
-      Object.values(errors.errors).forEach(errorText => toast.error(errorText));
       console.error('Login mutation error:', errors);
     }
   });
 };
 
-export const useRegisterMutation = (): UseMutationResult<RegisterMutationResponse, Error, RegisterMutationArguments> => {
+export const useRegisterMutation = (): UseMutationResult<RegisterMutationResponse, StandardizedApiError, RegisterMutationArguments> => {
   return useMutation({
-    mutationFn: AuthService.handleRegister
+    mutationFn: AuthService.handleRegister,
+    onError: (errors: StandardizedApiError) => {
+      toast.error(errors.message);
+      console.error('Login mutation error:', errors);
+    }
   });
 };
