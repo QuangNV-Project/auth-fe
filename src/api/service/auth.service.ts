@@ -7,7 +7,7 @@ import {
 } from "../actions/auth/auth.types"
 import { apiRequest } from '@/api/axios'
 
-const AUTH_API_BASE_URL = '/api/auth/public'
+const AUTH_API_BASE_URL = '/auth/public'
 
 interface AuthServiceType {
     handleLogin: (data: LoginMutationArguments) => Promise<LoginMutationResponse>

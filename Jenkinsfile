@@ -6,8 +6,8 @@ pipeline {
         REMOTE_DIR_NGINX  = '/var/www/nginx/auth-fe'
         BUILD_OUTPUT_DIR = 'build' 
         
-        ENV_DEV_ID  = 'env-file-react-dev'
-        ENV_PROD_ID = 'env-file-react-prod'
+        ENV_DEV_ID  = 'env-file-auth-dev'
+        ENV_PROD_ID = 'env-file-auth-prod'
         
         NODE_IMAGE      = 'node:24-alpine'
         // ==================================================
