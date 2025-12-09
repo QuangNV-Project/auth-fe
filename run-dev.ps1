@@ -14,9 +14,9 @@ $ProjectPath = "D:\quangnv\Code\BASE_PROJECT_FE\auth-fe"
 Set-Location $ProjectPath
 
 # Cài dependencies
-# Write-Host "Installing dependencies..."
-# & "$NodePortable\npm.cmd" install
+Write-Host "Installing dependencies..."
+& "$NodePortable\npm.cmd" install
 
 # Chạy dev server React
-Write-Host "Starting React dev server..."
-& "$NodePortable\npm.cmd" run dev
+# Write-Host "Starting React dev server..."
+# & "$NodePortable\npm.cmd" run dev
