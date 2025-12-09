@@ -80,7 +80,7 @@ export default defineConfig(({ command, mode }) => {
       css: true,
     },
     server: {
-      port: Number(env.VITE_PORT) || 3000,
+      port: Number(env.VITE_AUTH_PORT) || 3000,
     },
   }
 })
