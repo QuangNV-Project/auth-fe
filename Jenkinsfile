@@ -3,13 +3,13 @@ pipeline {
 
     environment {
         // ================= CẤU HÌNH CHUNG =================
-        REMOTE_DIR_NGINX  = '/var/www/nginx/auth-fe'
+        REMOTE_DIR_NGINX  = '/home/quangnv_dev/infra/nginx/admin-fe'
         BUILD_OUTPUT_DIR = 'build' 
         
         ENV_DEV_ID  = 'env-file-auth-dev'
         ENV_PROD_ID = 'env-file-auth-prod'
         
-        NODE_IMAGE      = 'node:24-alpine'
+        NODE_IMAGE      = 'node:24.0.0-alpine'
         // ==================================================
     }
 
