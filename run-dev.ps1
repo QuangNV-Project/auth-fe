@@ -18,5 +18,5 @@ Write-Host "Installing dependencies..."
 & "$NodePortable\npm.cmd" install
 
 # Chạy dev server React
-# Write-Host "Starting React dev server..."
-# & "$NodePortable\npm.cmd" run dev
+Write-Host "Starting React dev server..."
+& "$NodePortable\npm.cmd" run dev
