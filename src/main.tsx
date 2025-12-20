@@ -9,5 +9,6 @@ export const router = createRouter({ routeTree, scrollRestoration: true })
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <RouterProvider router={router} />
+
   </StrictMode>
 )

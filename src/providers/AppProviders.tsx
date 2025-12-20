@@ -6,7 +6,8 @@ const AppProviders: FC<AppProvidersProps> = ({
   children,
 }: AppProvidersProps): ReactNode => {
   return (
-    <AppIntegration>{children}
+    <AppIntegration>
+      {children}
     </AppIntegration>
   )
 }

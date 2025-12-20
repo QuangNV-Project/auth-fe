@@ -1,6 +1,7 @@
 export type LoginMutationArguments = {
-  userName: string
-  password: string
+  token?: string
+  userName?: string
+  password?: string
   redirectTo: string
   state: string
 }

@@ -14,8 +14,8 @@ $ProjectPath = "D:\quangnv\Code\BASE_PROJECT_FE\auth-fe"
 Set-Location $ProjectPath
 
 # Cài dependencies
-Write-Host "Installing dependencies..."
-& "$NodePortable\npm.cmd" install
+# Write-Host "Installing dependencies..."
+# & "$NodePortable\npm.cmd" i @react-oauth/google
 
 # Chạy dev server React
 Write-Host "Starting React dev server..."

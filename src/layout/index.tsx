@@ -1,10 +1,11 @@
+import { Outlet } from "@tanstack/react-router"
 
 
 const Layout = () => {
   return (
-   <div>
-    This is Layout
-   </div>
+    <div>
+      <Outlet />
+    </div>
   )
 }
 

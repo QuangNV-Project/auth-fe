@@ -32,3 +32,13 @@ export const useRegisterMutation = (): UseMutationResult<RegisterMutationRespons
     }
   });
 };
+
+export const useLoginGoogleMutation = (): UseMutationResult<LoginMutationResponse, StandardizedApiError, LoginMutationArguments> => {
+  return useMutation({
+    mutationFn: AuthService.handleLoginGoogle,
+    onError: (errors: StandardizedApiError) => {
+      toast.error(errors.message);
+      console.error('Login Google mutation error:', errors);
+    }
+  });
+}

@@ -5,3 +5,10 @@ export const API_METHOD = {
     DELETE: 'delete',
     PATCH: 'patch',
 }
+
+export const ProjectType = {
+    STORY: 'STORY',
+    SHOP: 'SHOP',
+    WORKSPACE: 'WORKSPACE',
+    CASH_CONTROL: 'CASH_CONTROL',
+}

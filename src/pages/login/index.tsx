@@ -8,18 +8,22 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-import { Link, useSearch } from '@tanstack/react-router'
-import { CredentialResponse, GoogleLogin } from '@react-oauth/google'
+import { Link, useSearch, useNavigate } from '@tanstack/react-router'
+import { useGoogleLogin } from '@react-oauth/google'
 import { toast } from 'react-toastify'
 import { Input } from '@/components/ui/input'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, LoginFormData } from '@/schema/loginSchema'
-import { useLoginMutation } from '@/api/actions/auth/auth.mutations'
+import { useLoginGoogleMutation, useLoginMutation } from '@/api/actions/auth/auth.mutations'
 import { useCallback } from 'react'
 import { LoginMutationResponse } from '@/api/actions/auth/auth.types'
+import { authStore } from '@/stores/authStore'
 
 export const LoginPage = () => {
+  const { updateAuthField } = authStore();
+
+  const navigate = useNavigate()
   const { redirectTo, state } = useSearch({
     strict: false,
   });
@@ -33,6 +37,7 @@ export const LoginPage = () => {
   })
 
   const { mutateAsync: credentialLoginMutation } = useLoginMutation()
+  const { mutateAsync: googleLoginMutation } = useLoginGoogleMutation();
 
   const handleLogin = useCallback(async (data: LoginFormData) => {
     await credentialLoginMutation({
@@ -40,15 +45,45 @@ export const LoginPage = () => {
       password: data.password,
       redirectTo,
       state
-    }, {onSuccess: (res: LoginMutationResponse) => {
-      window.location.href = res.redirectTo+"/callback?code="+res.code+"&state="+res.state;
-      toast.success('Login successful')
-    }})
-  }, [credentialLoginMutation])
+    }, {
+      onSuccess: (res: LoginMutationResponse) => {
+        // Nếu có redirectTo thì chuyển về callback URL
+        if (res.redirectTo) {
+          window.location.href = res.redirectTo + "/callback?code=" + res.code + "&state=" + res.state;
+        } else {
+          // Nếu không có redirectTo thì chuyển đến trang list-web
+          updateAuthField('isAuthenticated', true);
+          navigate({ to: '/list-web' })
+        }
+        toast.success('Login successful')
+      }
+    })
+  }, [credentialLoginMutation, navigate])
 
-  const handleGoogleLogin = useCallback(async (_credentialResponse: CredentialResponse) => {
-    toast.info('Google login is not implemented yet')
-  }, [])
+  const googleLogin = useGoogleLogin({
+    flow: 'auth-code',
+    onSuccess: async (codeResponse) => {
+      const res = await googleLoginMutation({
+        token: codeResponse.code,
+        redirectTo,
+        state
+      });
+
+      if (res.redirectTo) {
+        window.location.href =
+          `${res.redirectTo}/callback?code=${res.code}&state=${res.state}`;
+      } else {
+        updateAuthField('isAuthenticated', true);
+        navigate({ to: '/list-web' });
+      }
+
+      toast.success('Login successful');
+
+    },
+    onError: () => {
+      toast.error('Google login failed');
+    },
+  });
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
@@ -113,7 +148,7 @@ export const LoginPage = () => {
                 </div>
               </div>
               <div className="w-full flex justify-center">
-                <GoogleLogin width={'100%'} onSuccess={handleGoogleLogin} />
+                <Button onClick={() => googleLogin()}>Login with Google</Button>
               </div>
               <div className="text-sm text-center space-y-2">
                 <Link

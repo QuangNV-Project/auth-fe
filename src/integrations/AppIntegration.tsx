@@ -39,6 +39,7 @@ const AppIntegration: FC<AppIntegrationProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
+
   return (
     <GoogleOAuthProvider clientId={ENV.GOOGLE_CLIENT_ID}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
