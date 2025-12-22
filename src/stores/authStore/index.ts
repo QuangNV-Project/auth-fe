@@ -1,17 +1,15 @@
+import { AuthMutationResponse } from '@/api/actions/auth/auth.types'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-interface AuthValuesType {
+type AuthValuesType = AuthMutationResponse & {
   isAuthenticated: boolean
-  userId: string
-  email: string
-  role: string
-  token: string
 }
 
 interface AuthState {
   authValues: AuthValuesType
   setAuthData: (authValues: AuthValuesType) => void
+  setAccessToken: (token: string) => void
   clearTokens: () => void
   updateAuthField: <K extends keyof AuthValuesType>(
     key: K,
@@ -25,20 +23,27 @@ export const authStore = create<AuthState>()(
     (set, get) => ({
       authValues: {
         isAuthenticated: false,
-        userId: '',
-        email: '',
-        role: '',
-        token: '',
+        accessToken: '',
+        refreshToken: '',
+        tokenType: '',
+        expiresIn: 0,
+        user: undefined
+
       },
       setAuthData: authValues => set({ authValues }),
+      setAccessToken: token =>
+        set(state => ({
+          authValues: { ...state.authValues, accessToken: token },
+        })),
       clearTokens: () =>
         set({
           authValues: {
             isAuthenticated: false,
-            userId: '',
-            email: '',
-            role: '',
-            token: '',
+            accessToken: '',
+            refreshToken: '',
+            tokenType: '',
+            expiresIn: 0,
+            user: undefined
           },
         }),
 
@@ -49,7 +54,7 @@ export const authStore = create<AuthState>()(
             [key]: value,
           },
         })),
-      getRole: (): string | null => get().authValues.role,
+      getRole: (): string | null => get().authValues.user?.role || null,
     }),
     {
       name: 'auth-storage',

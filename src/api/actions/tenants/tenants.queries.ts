@@ -12,5 +12,6 @@ export const useTenants = () => {
         queryKey: tenantsKeys.lists(),
         queryFn: () => TenantService.getAll(),
         staleTime: 5 * 60 * 1000,
+        enabled: true,
     });
 };

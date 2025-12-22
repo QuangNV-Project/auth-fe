@@ -1,29 +1,22 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { ENV } from '@/config/env'
-import { ApiErrorResponse, StandardizedApiError } from '@/types/common.ts'
+import { ApiSuccessResponse } from '../types/types';
+import { ApiErrorResponse, StandardizedApiError } from '@/types/common.ts';
+import { authStore } from '@/stores/authStore';
 
 const axiosClient = axios.create({
   baseURL: ENV.BACK_END_URL,
-  timeout: 1000000,
+  timeout: 100000, // Thường là 100s, check lại đơn vị ms
   withCredentials: true,
 })
 
-function getTokenFromStorage(): string | null {
-  try {
-    const t = localStorage.getItem('token')
-    if (t) return t
-  } catch (e) {
-    console.error('Error getting token from localStorage', e)
-  }
-  return null
-}
-
+// Custom Error Class
 export class ApiError extends Error implements StandardizedApiError {
   success: false = false
   statusCode: number
   timestamp: Date
   data: unknown | null
-  errors: object
+  errors: string
 
   constructor(message: string, statusCode: number = 0, standardizedError?: StandardizedApiError) {
     super(message)
@@ -31,61 +24,47 @@ export class ApiError extends Error implements StandardizedApiError {
     this.statusCode = statusCode
     this.timestamp = standardizedError?.timestamp || new Date()
     this.data = standardizedError?.data || null
-    this.errors = standardizedError?.errors || {}
+    this.errors = standardizedError?.errors || ''
   }
 }
 
-// Request interceptor: attach auth header and sensible content-type
-axiosClient.interceptors.request.use((config: any) => {
-  const token = getTokenFromStorage()
+// REQUEST INTERCEPTOR
+axiosClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  const token = authStore.getState().authValues.accessToken
   if (token) {
-    config.headers = {
-      ...(config.headers || {}),
-      Authorization: `Bearer ${token}`,
-    }
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // If body is FormData, let browser set appropriate headers
-  const isForm = config.data instanceof FormData
-  if (!isForm) {
-    config.headers = {
-      'Content-Type': 'application/json',
-      ...(config.headers || {}),
-    }
+  // Content-Type logic
+  if (!(config.data instanceof FormData)) {
+    config.headers['Content-Type'] = 'application/json';
   }
 
   return config
 })
 
-// Response interceptor: normalize data and errors
+// RESPONSE INTERCEPTOR
 axiosClient.interceptors.response.use(
-  (response: AxiosResponse) => {
-    const payload = response.data
-    return payload.data
-  },
-  (error: AxiosError<ApiErrorResponse>) => {
-    // Network or server errors
-    const resp = error?.response
-    const status = resp?.status || 0
-    const errorData = resp?.data as ApiErrorResponse
+  (response: AxiosResponse) => response,
+  async (error: AxiosError<ApiErrorResponse>) => {
+    const status = error.response?.status;
 
-    // Create standardized error
+    // Chuẩn hóa lỗi API cho các trường hợp khác
+    const errorData = error.response?.data as ApiErrorResponse;
     const standardizedError: StandardizedApiError = {
       success: false,
-      message: errorData?.message || error?.message || 'Unknown API error',
+      message: errorData?.message || error.message || 'Unknown API error',
       data: errorData?.data || null,
-      errors: errorData?.errors || [],
-      statusCode: status,
+      errors: errorData?.errors || '',
+      statusCode: status || 0,
       timestamp: new Date(),
-    }
+    };
 
-    const apiErr = new ApiError(standardizedError.message, status, standardizedError)
-    return Promise.reject(apiErr)
+    return Promise.reject(new ApiError(standardizedError.message, status, standardizedError));
   }
 )
 
-export const apiRequest = async <T = any>(config: AxiosRequestConfig): Promise<T> => {
-  return (axiosClient.request as any)(config) as Promise<T>
+export const apiRequest = async <T = any>(config: AxiosRequestConfig): Promise<ApiSuccessResponse<T>> => {
+  const response = await axiosClient.request<T>(config)
+  return response.data as ApiSuccessResponse<T>
 }
-
-export default axiosClient

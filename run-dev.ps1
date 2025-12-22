@@ -1,5 +1,3 @@
-# run-dev.ps1
-
 # Node portable
 $NodePortable = "D:\Software\node-v24.11.0-win-x64\node-v24.11.0-win-x64"
 
@@ -15,7 +13,7 @@ Set-Location $ProjectPath
 
 # Cài dependencies
 # Write-Host "Installing dependencies..."
-# & "$NodePortable\npm.cmd" i @react-oauth/google
+# & "$NodePortable\npm.cmd" ci
 
 # Chạy dev server React
 Write-Host "Starting React dev server..."

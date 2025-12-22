@@ -2,7 +2,7 @@ export type ApiErrorResponse = {
   success: false
   message: string
   data: unknown | null
-  errors: object
+  errors: string
 }
 
 export interface StandardizedApiError extends ApiErrorResponse {

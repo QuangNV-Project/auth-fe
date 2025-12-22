@@ -12,3 +12,11 @@ export type ExtendedQueryMeta = QueryMeta & {
 export type ExtendedAxiosRequestConfig = AxiosRequestConfig & {
   _retry?: boolean
 }
+
+export interface ApiSuccessResponse<T> {
+  success: true
+  message: string
+  data: T
+  statusCode: number
+  timestamp: Date
+}

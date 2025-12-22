@@ -18,10 +18,8 @@ import { loginSchema, LoginFormData } from '@/schema/loginSchema'
 import { useLoginGoogleMutation, useLoginMutation } from '@/api/actions/auth/auth.mutations'
 import { useCallback } from 'react'
 import { LoginMutationResponse } from '@/api/actions/auth/auth.types'
-import { authStore } from '@/stores/authStore'
 
 export const LoginPage = () => {
-  const { updateAuthField } = authStore();
 
   const navigate = useNavigate()
   const { redirectTo, state } = useSearch({
@@ -52,13 +50,12 @@ export const LoginPage = () => {
           window.location.href = res.redirectTo + "/callback?code=" + res.code + "&state=" + res.state;
         } else {
           // Nếu không có redirectTo thì chuyển đến trang list-web
-          updateAuthField('isAuthenticated', true);
-          navigate({ to: '/list-web' })
+          navigate({ to: '/callback', search: { code: res.code } });
         }
         toast.success('Login successful')
       }
     })
-  }, [credentialLoginMutation, navigate])
+  }, [credentialLoginMutation])
 
   const googleLogin = useGoogleLogin({
     flow: 'auth-code',
@@ -73,8 +70,7 @@ export const LoginPage = () => {
         window.location.href =
           `${res.redirectTo}/callback?code=${res.code}&state=${res.state}`;
       } else {
-        updateAuthField('isAuthenticated', true);
-        navigate({ to: '/list-web' });
+        navigate({ to: '/callback', search: { code: res.code } });
       }
 
       toast.success('Login successful');
@@ -148,7 +144,7 @@ export const LoginPage = () => {
                 </div>
               </div>
               <div className="w-full flex justify-center">
-                <Button onClick={() => googleLogin()}>Login with Google</Button>
+                <Button type="button" onClick={() => googleLogin()}>Login with Google</Button>
               </div>
               <div className="text-sm text-center space-y-2">
                 <Link

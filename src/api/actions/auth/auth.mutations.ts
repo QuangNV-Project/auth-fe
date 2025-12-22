@@ -8,16 +8,23 @@ import {
 } from './auth.types';
 import { toast } from 'react-toastify';
 import { StandardizedApiError } from '@/types/common.ts';
+import { AuthExchangeCodeReq } from '@/types/auth';
 export const authMutations = {
   loginMutation: AuthService.handleLogin,
   registerMutation: AuthService.handleRegister,
 }
 
+export const useAuthMutation = () => {
+    return useMutation({
+        mutationFn: (data: AuthExchangeCodeReq) => AuthService.handleExchangeAuthCode(data),
+    });
+};
+
 export const useLoginMutation = (): UseMutationResult<LoginMutationResponse, StandardizedApiError, LoginMutationArguments> => {
   return useMutation({
     mutationFn: AuthService.handleLogin,
     onError: (errors: StandardizedApiError) => {
-      toast.error(errors.message);
+      toast.error(errors.errors || errors.message);
       console.error('Login mutation error:', errors);
     }
   });

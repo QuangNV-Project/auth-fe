@@ -14,6 +14,6 @@ export const TenantService: TenantServiceType = {
             method: API_METHOD.GET,
             url: `${TENANT_API_BASE_URL}/tenant/get-by-user`,
         })
-        return res
+        return res.data
     }
 }
