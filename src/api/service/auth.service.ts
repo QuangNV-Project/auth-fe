@@ -14,7 +14,6 @@ const AUTH_API_BASE_URL = '/auth/public'
 interface AuthServiceType {
     handleLogin: (data: LoginMutationArguments) => Promise<LoginMutationResponse>
     handleRegister: (data: RegisterMutationArguments) => Promise<RegisterMutationResponse>
-    handleLoginGoogle?: (data: LoginMutationArguments) => Promise<LoginMutationResponse>
     handleExchangeAuthCode: (data: AuthExchangeCodeReq) => Promise<AuthMutationResponse>
 }
 
@@ -35,14 +34,6 @@ export const AuthService: AuthServiceType = {
             data,
         })
 
-        return res.data
-    },
-    handleLoginGoogle: async function (data: LoginMutationArguments): Promise<LoginMutationResponse> {
-        const res = await apiRequest<LoginMutationResponse>({
-            method: API_METHOD.POST,
-            url: `${AUTH_API_BASE_URL}/auth/login-google`,
-            data,
-        })
         return res.data
     },
     handleExchangeAuthCode: async function (data: AuthExchangeCodeReq): Promise<AuthMutationResponse> {

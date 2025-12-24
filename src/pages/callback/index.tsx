@@ -10,7 +10,7 @@ type CallbackStatus = 'loading' | 'success' | 'error';
 
 const CallbackPage: FC = () => {
     const { setAuthData } = authStore()
-    const { code } = useSearch({
+    const { code, type } = useSearch({
         strict: false,
     });
     const navigate = useNavigate();
@@ -27,7 +27,7 @@ const CallbackPage: FC = () => {
         if (code) {
             setStatus('loading');
             authMutation.mutateAsync(
-                { code },
+                { code, type },
                 {
                     onSuccess: (data) => {
                         setStatus('success');

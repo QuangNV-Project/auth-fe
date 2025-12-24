@@ -2,10 +2,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { ExternalLink, Globe, LogOut } from 'lucide-react'
 import { useTenants } from '@/api/actions/tenants/tenants.queries'
-import { ReactNode, useMemo } from 'react'
+import { useMemo } from 'react'
 import { authStore } from '@/stores/authStore'
 import { useRouter } from '@tanstack/react-router'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { TenantRes } from '@/types/tenants'
 
 
 export const ListWebPage = () => {
@@ -16,28 +17,22 @@ export const ListWebPage = () => {
 
     const groupedByProject = useMemo(() => {
         if (!tenants || tenants.length === 0) return [] as Array<{
-            projectId: string
+            projectId: number
             projectName: string
-            projectColor: string
-            projectIcon: ReactNode | null
-            items: any[]
+            items: TenantRes[]
         }>
 
-        const map = new Map<string, any[]>()
-        tenants.forEach((t: any) => {
-            const key = String(t?.projectId ?? t?.project?.id ?? 'unknown')
-            const arr = map.get(key) ?? []
+        const map = new Map<number, TenantRes[]>()
+        tenants.forEach((t: TenantRes) => {
+            const arr = map.get(t.projectId) ?? []
             arr.push(t)
-            map.set(key, arr)
+            map.set(t.projectId, arr)
         })
 
         return Array.from(map.entries()).map(([projectId, items]) => {
-            const first: any = items[0]
             return {
                 projectId,
-                projectName: first?.project?.name ?? first?.projectName ?? `Project ${projectId}`,
-                projectColor: first?.project?.color ?? first?.color ?? 'from-gray-400 to-gray-600',
-                projectIcon: first?.project?.icon ?? first?.icon ?? null,
+                projectName: items[0].projectName,
                 items,
             }
         })
@@ -115,8 +110,8 @@ export const ListWebPage = () => {
                         <div key={group.projectId} className="mb-10">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${group.projectColor} flex items-center justify-center text-white`}>
-                                        {group.projectIcon ?? <Globe className="h-6 w-6" />}
+                                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white">
+                                        <Globe className="h-6 w-6" />
                                     </div>
                                     <h2 className="text-2xl font-semibold text-gray-800">{group.projectName}</h2>
                                 </div>
@@ -124,22 +119,25 @@ export const ListWebPage = () => {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {group.items.map((tenant: any) => (
+                                {group.items.map((tenant) => (
                                     <Card
-                                        key={tenant.id}
+                                        key={tenant.tenantId}
                                         className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer group"
-                                        onClick={() => handleNavigate(tenant.url)}
+                                        onClick={() => handleNavigate(tenant.siteUrl)}
                                     >
                                         <CardHeader>
-                                            <div className={`w-16 h-16 rounded-lg bg-gradient-to-br ${tenant.color ?? group.projectColor} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                                                {tenant.icon ?? group.projectIcon ?? <Globe className="h-6 w-6" />}
+                                            <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300">
+                                                <Globe className="h-8 w-8" />
                                             </div>
                                             <CardTitle className="text-2xl mb-2 flex items-center justify-between">
-                                                {tenant.name}
+                                                {tenant.siteTitle}
                                                 <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-orange-500 transition-colors" />
                                             </CardTitle>
                                             <CardDescription className="text-base">
-                                                {tenant.description}
+                                                <div className="flex items-center gap-2">
+                                                    <Globe className="h-4 w-4 text-gray-400" />
+                                                    <span className="text-sm font-mono text-gray-600">{tenant.domainName}</span>
+                                                </div>
                                             </CardDescription>
                                         </CardHeader>
                                         <CardContent>
@@ -147,7 +145,7 @@ export const ListWebPage = () => {
                                                 className="w-full bg-orange-500 hover:bg-orange-600 text-white"
                                                 onClick={(e) => {
                                                     e.stopPropagation()
-                                                    handleNavigate(tenant.url)
+                                                    handleNavigate(tenant.siteUrl)
                                                 }}
                                             >
                                                 Truy cập

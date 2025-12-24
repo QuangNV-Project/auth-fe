@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, LoginFormData } from '@/schema/loginSchema'
-import { useLoginGoogleMutation, useLoginMutation } from '@/api/actions/auth/auth.mutations'
+import { useLoginMutation } from '@/api/actions/auth/auth.mutations'
 import { useCallback } from 'react'
 import { LoginMutationResponse } from '@/api/actions/auth/auth.types'
 
@@ -35,7 +35,6 @@ export const LoginPage = () => {
   })
 
   const { mutateAsync: credentialLoginMutation } = useLoginMutation()
-  const { mutateAsync: googleLoginMutation } = useLoginGoogleMutation();
 
   const handleLogin = useCallback(async (data: LoginFormData) => {
     await credentialLoginMutation({
@@ -47,10 +46,10 @@ export const LoginPage = () => {
       onSuccess: (res: LoginMutationResponse) => {
         // Nếu có redirectTo thì chuyển về callback URL
         if (res.redirectTo) {
-          window.location.href = res.redirectTo + "/callback?code=" + res.code + "&state=" + res.state;
+          window.location.href = res.redirectTo + "/callback?code=" + res.code + "&state=" + res.state + "&type=ACCOUNT";
         } else {
           // Nếu không có redirectTo thì chuyển đến trang list-web
-          navigate({ to: '/callback', search: { code: res.code } });
+          navigate({ to: '/callback', search: { code: res.code, type: 'ACCOUNT' } });
         }
         toast.success('Login successful')
       }
@@ -59,18 +58,12 @@ export const LoginPage = () => {
 
   const googleLogin = useGoogleLogin({
     flow: 'auth-code',
-    onSuccess: async (codeResponse) => {
-      const res = await googleLoginMutation({
-        token: codeResponse.code,
-        redirectTo,
-        state
-      });
-
-      if (res.redirectTo) {
+    onSuccess: async (codeResponse ) => {
+      if (redirectTo) {
         window.location.href =
-          `${res.redirectTo}/callback?code=${res.code}&state=${res.state}`;
+          `${redirectTo}/callback?code=${codeResponse.code}&state=${state}&type=GOOGLE`;
       } else {
-        navigate({ to: '/callback', search: { code: res.code } });
+        navigate({ to: '/callback', search: { code: codeResponse.code, type: 'GOOGLE' } });
       }
 
       toast.success('Login successful');
