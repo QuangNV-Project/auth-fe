@@ -3,7 +3,12 @@ pipeline {
 
     environment {
         // ================= CẤU HÌNH CHUNG =================
-        REMOTE_DIR_NGINX  = '/home/quangnv_dev/infra/nginx/auth-fe'
+        // DEV
+        REMOTE_DIR_DEV_NGINX  = '/home/quangnv_dev/infra/nginx/auth-fe'
+
+        // PROD
+        REMOTE_DIR_PROD_NGINX  = '/home/quangnv/infra/nginx/auth-fe'
+
         BUILD_OUTPUT_DIR = 'build' 
         
         ENV_DEV_ID  = 'env-file-fe-dev'
@@ -66,7 +71,7 @@ pipeline {
                         string(credentialsId: 'remote-server-dev-port', variable: 'REMOTE_PORT'),
                         sshUserPrivateKey(credentialsId: 'remote-ssh-key-dev', keyFileVariable: 'SSH_KEY')
                     ]) {
-                        deployReactApp(REMOTE_DIR_NGINX)
+                        deployReactApp(REMOTE_DIR_DEV_NGINX)
                     }
                 }
             }
@@ -109,7 +114,7 @@ pipeline {
                         string(credentialsId: 'remote-server-prod-port', variable: 'REMOTE_PORT'),
                         sshUserPrivateKey(credentialsId: 'remote-ssh-key-prod', keyFileVariable: 'SSH_KEY')
                     ]) {
-                        deployReactApp(REMOTE_DIR_NGINX)
+                        deployReactApp(REMOTE_DIR_PROD_NGINX)
                     }
                 }
             }
