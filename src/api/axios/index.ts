@@ -34,6 +34,7 @@ axiosClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  config.headers['X-Tenant-Code'] = ENV.TENANT_CODE;
 
   // Content-Type logic
   if (!(config.data instanceof FormData)) {

@@ -51,7 +51,7 @@ pipeline {
                             echo "🔨 Building for DEV (With Cache)..."
                             
                             // Lần đầu sẽ tải về Host. Lần sau sẽ lấy từ Host -> Container (Cực nhanh)
-                            sh 'npm ci'
+                            sh 'npm ci --cache /.npm'
                             sh 'npm run build'
 
                             // [QUAN TRỌNG] Trả lại quyền sở hữu thư mục build cho user jenkins (UID 1000)
@@ -97,7 +97,7 @@ pipeline {
                             sh "cp '${ENV_PATH}' .env"
 
                             echo "🔨 Building for PROD (With Cache)..."
-                            sh 'npm ci'
+                            sh 'npm ci --cache /.npm'
                             sh 'npm run build'
 
                             // Fix quyền
@@ -122,10 +122,6 @@ pipeline {
     }
 
     post {
-        always {
-            // Dọn dẹp workspace sau khi xong việc
-            cleanWs()
-        }
         success {
             echo '✅ React App deployed successfully!'
         }
@@ -147,11 +143,5 @@ def deployReactApp(targetDir) {
     // 2. Upload file
     sh """
         rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} -p ${REMOTE_PORT}" ./${BUILD_OUTPUT_DIR}/ ${REMOTE_USER}@${REMOTE_HOST}:${targetDir}/
-    """
-
-    // 3. Reload Nginx
-    echo "🔄 Reloading Nginx on Remote Server..."
-    sh """
-        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} 'sudo nginx -s reload'
     """
 }
