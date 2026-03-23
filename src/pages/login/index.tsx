@@ -18,13 +18,13 @@ import { loginSchema, LoginFormData } from '@/schema/loginSchema'
 import { useLoginMutation } from '@/api/actions/auth/auth.mutations'
 import { useCallback } from 'react'
 import { LoginMutationResponse } from '@/api/actions/auth/auth.types'
+import { Chrome } from 'lucide-react'
 
 export const LoginPage = () => {
-
   const navigate = useNavigate()
   const { redirectTo, state } = useSearch({
     strict: false,
-  });
+  })
   const {
     register,
     handleSubmit,
@@ -36,145 +36,149 @@ export const LoginPage = () => {
 
   const { mutateAsync: credentialLoginMutation } = useLoginMutation()
 
-  const handleLogin = useCallback(async (data: LoginFormData) => {
-    await credentialLoginMutation({
-      userName: data.username,
-      password: data.password,
-      redirectTo,
-      state
-    }, {
-      onSuccess: (res: LoginMutationResponse) => {
-        // Nếu có redirectTo thì chuyển về callback URL
-        if (res.redirectTo) {
-          window.location.href = res.redirectTo + "/callback?code=" + res.code + "&state=" + res.state + "&type=ACCOUNT";
-        } else {
-          // Nếu không có redirectTo thì chuyển đến trang list-web
-          navigate({ to: '/callback', search: { code: res.code, type: 'ACCOUNT' } });
-        }
-        toast.success('Login successful')
-      }
-    })
-  }, [credentialLoginMutation])
+  const handleLogin = useCallback(
+    async (data: LoginFormData) => {
+      await credentialLoginMutation(
+        {
+          userName: data.username,
+          password: data.password,
+          redirectTo,
+          state,
+        },
+        {
+          onSuccess: (res: LoginMutationResponse) => {
+            // Nếu có redirectTo thì chuyển về callback URL
+            if (res.redirectTo) {
+              window.location.href = `${res.redirectTo}/callback?code=${res.code}&state=${res.state}&type=ACCOUNT`
+            } else {
+              // Nếu không có redirectTo thì chuyển đến trang list-web
+              navigate({
+                to: '/callback',
+                search: { code: res.code, type: 'ACCOUNT' },
+              })
+            }
+            toast.success('Login successful')
+          },
+        },
+      )
+    },
+    [credentialLoginMutation, navigate, redirectTo, state],
+  )
 
   const googleLogin = useGoogleLogin({
     flow: 'auth-code',
-    onSuccess: async (codeResponse ) => {
+    onSuccess: async (codeResponse) => {
       if (redirectTo) {
-        window.location.href =
-          `${redirectTo}/callback?code=${codeResponse.code}&state=${state}&type=GOOGLE`;
+        window.location.href = `${redirectTo}/callback?code=${codeResponse.code}&state=${state}&type=GOOGLE`
       } else {
-        navigate({ to: '/callback', search: { code: codeResponse.code, type: 'GOOGLE' } });
+        navigate({
+          to: '/callback',
+          search: { code: codeResponse.code, type: 'GOOGLE' },
+        })
       }
 
-      toast.success('Login successful');
-
+      toast.success('Login successful')
     },
     onError: () => {
-      toast.error('Google login failed');
+      toast.error('Google login failed')
     },
-  });
+  })
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* Left side - Login form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 p-4 sm:p-8">
-        <Card className="w-full max-w-[400px]">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
-            <CardDescription className="text-lg">
-              Sign in to access your account
-            </CardDescription>
-          </CardHeader>
-          <form onSubmit={handleSubmit(handleLogin)}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Enter username"
-                  {...register('username')}
-                  className={errors.username ? 'border-red-500' : ''}
-                />
-                {errors.username && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.username.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter password"
-                  {...register('password')}
-                  className={errors.password ? 'border-red-500' : ''}
-                />
-                {errors.password && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
-            </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
-              <Button
-                type="submit"
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white"
-                disabled={isSubmitting}
+    <div
+      className="min-h-screen w-full flex items-center justify-center bg-cover bg-center p-4"
+      style={{
+        backgroundImage:
+          "url('https://images.unsplash.com/photo-1487017159836-4e23ece2e4cf?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+      }}
+    >
+      <Card className="w-full max-w-md bg-black/50 text-white backdrop-blur-lg border border-gray-500">
+        <CardHeader className="text-center space-y-2">
+          <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
+          <CardDescription className="text-gray-200">
+            Sign in to access your account and continue your journey.
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit(handleLogin)}>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="your_username"
+                {...register('username')}
+                className={`bg-black/20 border-gray-500 placeholder:text-gray-400 focus:ring-orange-500 ${errors.username ? 'border-red-500' : ''}`}
+              />
+              {errors.username && (
+                <p className="text-sm text-red-400 mt-1">
+                  {errors.username.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                {...register('password')}
+                className={`bg-black/20 border-gray-500 placeholder:text-gray-400 focus:ring-orange-500 ${errors.password ? 'border-red-500' : ''}`}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-400 mt-1">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+            <div className="flex items-center justify-end">
+              <Link
+                to="/forgot-pass"
+                className="text-sm text-orange-400 hover:underline"
               >
-                {isSubmitting ? 'Logging in...' : 'Login'}
-              </Button>
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-gray-50 px-2 text-gray-500">
-                    Or continue with
-                  </span>
-                </div>
+                Forgot password?
+              </Link>
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-4">
+            <Button
+              type="submit"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Logging in...' : 'Login'}
+            </Button>
+            <div className="relative w-full">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-500" />
               </div>
-              <div className="w-full flex justify-center">
-                <Button type="button" onClick={() => googleLogin()}>Login with Google</Button>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-black/50 px-2 text-gray-300">
+                  Or continue with
+                </span>
               </div>
-              <div className="text-sm text-center space-y-2">
-                <Link
-                  to="/forgot-pass"
-                  className="text-orange-500 hover:underline block"
-                >
-                  Forgot password?
-                </Link>
-                <div>
-                  Don't have an account?{' '}
-                  <Link
-                    to="/register"
-                    className="text-orange-500 hover:underline font-medium"
-                  >
-                    Sign up
-                  </Link>
-                </div>
-              </div>
-            </CardFooter>
-          </form>
-        </Card>
-      </div>
-
-      {/* Right side - Background image */}
-      <div
-        className="hidden lg:block lg:w-1/2 bg-cover bg-center relative"
-        style={{ backgroundImage: "url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYlqSHWh4SkbN7fYvwk0TBLlnbFvbLfr3xwpbFSVZw4gDZ2_FwZ5EW-cXz9uIHjXLZ-noFHceZDJq5PLTqdcV8ifdQXCWd_kVj7BBXT2dIsA&s=10" }}
-      >
-        <div className="h-full w-full bg-black/40 flex items-center justify-center">
-          <div className="text-white text-center p-8">
-            <h1 className="text-4xl font-bold mb-4">Welcome Back!</h1>
-            <p className="text-lg">
-              Sign in to access your account and manage your facilities
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full bg-black/20 border-gray-500 hover:bg-black/40"
+              onClick={() => googleLogin()}
+            >
+              <Chrome className="mr-2 h-4 w-4" />
+              Login with Google
+            </Button>
+            <p className="text-center text-sm text-gray-200">
+              Don't have an account?{' '}
+              <Link
+                to="/register"
+                className="font-semibold text-orange-400 hover:underline"
+              >
+                Sign up
+              </Link>
             </p>
-          </div>
-        </div>
-      </div>
+          </CardFooter>
+        </form>
+      </Card>
     </div>
   )
 }
