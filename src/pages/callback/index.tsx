@@ -55,18 +55,18 @@ const CallbackPage: FC = () => {
                 return (
                     <>
                         <CardHeader className="text-center pb-2">
-                            <div className="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                                <Shield className="w-8 h-8 text-blue-600" />
+                            <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-primary/10 text-primary">
+                                <Shield className="w-8 h-8" />
                             </div>
-                            <CardTitle className="text-xl font-semibold text-gray-800">
+                            <CardTitle className="text-xl font-semibold">
                                 Authenticating...
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-center pb-8">
                             <div className="flex justify-center mb-4">
-                                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                                <Loader2 className="w-8 h-8 animate-spin text-primary" />
                             </div>
-                            <p className="text-gray-600 text-sm">
+                            <p className="text-muted-foreground text-sm leading-6">
                                 Please wait while we verify your credentials and set up your session.
                             </p>
                         </CardContent>
@@ -77,18 +77,18 @@ const CallbackPage: FC = () => {
                 return (
                     <>
                         <CardHeader className="text-center pb-2">
-                            <div className="mx-auto mb-4 w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                                <CheckCircle className="w-8 h-8 text-green-600" />
+                            <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-500">
+                                <CheckCircle className="w-8 h-8" />
                             </div>
-                            <CardTitle className="text-xl font-semibold text-gray-800">
+                            <CardTitle className="text-xl font-semibold">
                                 Authentication Successful!
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-center pb-8">
-                            <p className="text-gray-600 text-sm mb-2">
+                            <p className="text-muted-foreground text-sm mb-2">
                                 Welcome back! You have been successfully authenticated.
                             </p>
-                            <p className="text-gray-500 text-xs">
+                            <p className="text-muted-foreground text-xs">
                                 Redirecting you to the dashboard...
                             </p>
                         </CardContent>
@@ -99,20 +99,20 @@ const CallbackPage: FC = () => {
                 return (
                     <>
                         <CardHeader className="text-center pb-2">
-                            <div className="mx-auto mb-4 w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                                <XCircle className="w-8 h-8 text-red-600" />
+                            <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-destructive/10 text-destructive">
+                                <XCircle className="w-8 h-8" />
                             </div>
-                            <CardTitle className="text-xl font-semibold text-gray-800">
+                            <CardTitle className="text-xl font-semibold">
                                 Authentication Failed
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-center pb-8">
-                            <p className="text-red-600 text-sm mb-4">
+                            <p className="text-destructive text-sm mb-4">
                                 {error}
                             </p>
                             <Button
                                 onClick={handleNavigateAuth}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+                                className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90"
                             >
                                 Back to Login
                             </Button>
@@ -126,8 +126,8 @@ const CallbackPage: FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-            <Card className="w-full max-w-md mx-auto shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+        <div className="app-canvas flex items-center justify-center p-5">
+            <Card className="w-full max-w-md mx-auto rounded-3xl border-border/70 bg-card/80 shadow-2xl shadow-primary/10 backdrop-blur-xl">
                 {renderContent()}
             </Card>
         </div>

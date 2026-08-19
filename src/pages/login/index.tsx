@@ -18,7 +18,7 @@ import { loginSchema, LoginFormData } from '@/schema/loginSchema'
 import { useLoginMutation } from '@/api/actions/auth/auth.mutations'
 import { useCallback } from 'react'
 import { LoginMutationResponse } from '@/api/actions/auth/auth.types'
-import { Chrome } from 'lucide-react'
+import { ArrowRight, Chrome, ShieldCheck, Sparkles } from 'lucide-react'
 
 export const LoginPage = () => {
   const navigate = useNavigate()
@@ -85,22 +85,25 @@ export const LoginPage = () => {
   })
 
   return (
-    <div
-      className="min-h-screen w-full flex items-center justify-center bg-cover bg-center p-4"
-      style={{
-        backgroundImage:
-          "url('https://images.unsplash.com/photo-1487017159836-4e23ece2e4cf?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
-      }}
-    >
-      <Card className="w-full max-w-md bg-black/50 text-white backdrop-blur-lg border border-gray-500">
-        <CardHeader className="text-center space-y-2">
-          <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
-          <CardDescription className="text-gray-200">
-            Sign in to access your account and continue your journey.
-          </CardDescription>
+    <div className="app-canvas flex items-center justify-center p-5 sm:p-8">
+      <div className="grid w-full max-w-5xl overflow-hidden rounded-[2rem] border border-border/70 bg-card/80 shadow-2xl shadow-primary/10 backdrop-blur-xl lg:grid-cols-[1.05fr_.95fr]">
+        <section className="hidden min-h-[640px] flex-col justify-between bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 p-10 text-white lg:flex">
+          <div className="flex items-center gap-3 font-semibold tracking-wide"><span className="grid h-10 w-10 place-items-center rounded-xl bg-white/15"><ShieldCheck className="h-5 w-5" /></span>ACCESS PORTAL</div>
+          <div className="space-y-5">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-sm"><Sparkles className="h-4 w-4" /> A simpler way to sign in</span>
+            <h1 className="max-w-md text-5xl font-semibold leading-tight">Everything you need, one secure place.</h1>
+            <p className="max-w-sm text-base leading-7 text-white/75">Connect to the products you have access to with a clean, protected account experience.</p>
+          </div>
+          <p className="text-sm text-white/60">Secure access, designed for focus.</p>
+        </section>
+        <Card className="flex min-h-[640px] w-full flex-col justify-center rounded-none border-0 bg-transparent shadow-none">
+          <CardHeader className="space-y-3 px-7 sm:px-12">
+            <span className="mb-2 inline-flex w-fit items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[.16em] text-primary lg:hidden"><ShieldCheck className="h-3.5 w-3.5" /> Access portal</span>
+            <CardTitle className="text-3xl font-semibold tracking-tight">Welcome back</CardTitle>
+            <CardDescription className="text-base leading-6">Sign in to continue to your workspace.</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(handleLogin)}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 px-7 sm:px-12">
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input
@@ -108,10 +111,10 @@ export const LoginPage = () => {
                 type="text"
                 placeholder="your_username"
                 {...register('username')}
-                className={`bg-black/20 border-gray-500 placeholder:text-gray-400 focus:ring-orange-500 ${errors.username ? 'border-red-500' : ''}`}
+                className={`h-11 bg-background/70 ${errors.username ? 'border-destructive' : ''}`}
               />
               {errors.username && (
-                <p className="text-sm text-red-400 mt-1">
+                <p className="mt-1 text-sm text-destructive">
                   {errors.username.message}
                 </p>
               )}
@@ -123,10 +126,10 @@ export const LoginPage = () => {
                 type="password"
                 placeholder="••••••••"
                 {...register('password')}
-                className={`bg-black/20 border-gray-500 placeholder:text-gray-400 focus:ring-orange-500 ${errors.password ? 'border-red-500' : ''}`}
+                className={`h-11 bg-background/70 ${errors.password ? 'border-destructive' : ''}`}
               />
               {errors.password && (
-                <p className="text-sm text-red-400 mt-1">
+                <p className="mt-1 text-sm text-destructive">
                   {errors.password.message}
                 </p>
               )}
@@ -134,26 +137,26 @@ export const LoginPage = () => {
             <div className="flex items-center justify-end">
               <Link
                 to="/forgot-pass"
-                className="text-sm text-orange-400 hover:underline"
+                className="text-sm font-medium text-primary hover:underline"
               >
                 Forgot password?
               </Link>
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-4">
+          <CardFooter className="flex flex-col gap-5 px-7 pb-7 sm:px-12 sm:pb-12">
             <Button
               type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold"
+              className="h-11 w-full rounded-xl bg-primary font-semibold shadow-lg shadow-primary/25 hover:bg-primary/90"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Logging in...' : 'Login'}
+              {isSubmitting ? 'Logging in...' : <>Login <ArrowRight className="h-4 w-4" /></>}
             </Button>
             <div className="relative w-full">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-500" />
+                <span className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-black/50 px-2 text-gray-300">
+                <span className="bg-card px-2 text-muted-foreground">
                   Or continue with
                 </span>
               </div>
@@ -161,24 +164,25 @@ export const LoginPage = () => {
             <Button
               type="button"
               variant="outline"
-              className="w-full bg-black/20 border-gray-500 hover:bg-black/40"
+              className="h-11 w-full rounded-xl bg-background/50"
               onClick={() => googleLogin()}
             >
               <Chrome className="mr-2 h-4 w-4" />
               Login with Google
             </Button>
-            <p className="text-center text-sm text-gray-200">
+            <p className="text-center text-sm text-muted-foreground">
               Don't have an account?{' '}
               <Link
                 to="/register"
-                className="font-semibold text-orange-400 hover:underline"
+                className="font-semibold text-primary hover:underline"
               >
                 Sign up
               </Link>
             </p>
           </CardFooter>
         </form>
-      </Card>
+        </Card>
+      </div>
     </div>
   )
 }

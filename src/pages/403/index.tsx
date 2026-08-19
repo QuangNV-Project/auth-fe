@@ -8,14 +8,14 @@ export const ForbiddenPage = () => {
   const navigate = useNavigate()
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-      <Card className="w-full max-w-2xl">
-        <CardContent className="p-8 text-center">
+    <div className="app-canvas flex min-h-screen items-center justify-center p-5">
+      <Card className="w-full max-w-2xl rounded-3xl border-border/70 bg-card/80 shadow-2xl shadow-primary/10 backdrop-blur-xl">
+        <CardContent className="p-8 text-center sm:p-12">
           {/* Error Icon */}
           <div className="mb-6">
             <div className="relative inline-block">
-              <Shield className="w-24 h-24 text-muted-foreground mx-auto" />
-              <div className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg">
+              <Shield className="w-24 h-24 text-primary mx-auto" />
+              <div className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg shadow-lg">
                 403
               </div>
             </div>
@@ -48,7 +48,7 @@ export const ForbiddenPage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               onClick={() => navigate({ to: '/' })}
-              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600"
+              className="flex items-center gap-2 rounded-xl shadow-lg shadow-primary/25"
             >
               <Home className="w-4 h-4" />
               Go to home
@@ -57,7 +57,7 @@ export const ForbiddenPage = () => {
             <Button
               variant="outline"
               onClick={() => router.history.back()}
-              className="flex items-center gap-2 border-orange-200 text-orange-600 hover:bg-orange-50"
+              className="flex items-center gap-2 rounded-xl"
             >
               <ArrowLeft className="w-4 h-4" />
               Go back
@@ -70,12 +70,12 @@ export const ForbiddenPage = () => {
             <div className="flex flex-wrap justify-center gap-4 text-sm">
               <Link
                 to="/home"
-                className="text-orange-600 hover:text-orange-700 hover:underline flex items-center gap-1"
+                className="text-primary hover:underline flex items-center gap-1"
               >
                 <Home className="w-3 h-3" />
                 Home
               </Link>
-              <span className="text-orange-600 hover:text-orange-700 hover:underline cursor-pointer flex items-center gap-1">
+              <span className="text-primary hover:underline cursor-pointer flex items-center gap-1">
                 <Shield className="w-3 h-3" />
                 Contact support
               </span>
