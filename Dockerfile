@@ -1,37 +1,29 @@
-# ==========================================
-# STAGE 1: Build React App
-# ==========================================
-FROM node:18-alpine as builder
+# syntax=docker/dockerfile:1.7
 
-# Đặt thư mục làm việc
+FROM node:22-alpine AS dependencies
+
 WORKDIR /app
 
-# Copy package.json trước để tận dụng Docker Cache
-# (Nếu code đổi nhưng thư viện ko đổi, bước npm install sẽ được bỏ qua -> Build siêu nhanh)
+ENV CI=true \
+    HUSKY=0
+
 COPY package.json package-lock.json ./
 
-# Cài đặt dependencies
-RUN npm ci
+RUN --mount=type=cache,id=auth-fe-npm,target=/root/.npm,sharing=locked \
+    npm ci --cache /root/.npm --prefer-offline --no-audit --no-fund
 
-# Copy toàn bộ source code vào
+FROM dependencies AS builder
+
+ARG BUILD_ENV_FINGERPRINT
+
 COPY . .
 
-# Thực hiện Build
-RUN npm run build
+RUN --mount=type=secret,id=frontend_env,target=/app/.env,required=true \
+    test -n "$BUILD_ENV_FINGERPRINT" && npm run build
 
-# ==========================================
-# STAGE 2: Serve with Nginx
-# ==========================================
+FROM scratch AS artifact
 
-# Copy file build từ Stage 1 sang thư mục Nginx của container
-COPY --from=builder /app/build /usr/share/nginx/html
+ARG OUTPUT_UID=1000
+ARG OUTPUT_GID=1000
 
-# Copy file cấu hình nginx custom (để fix lỗi React Router 404)
-# Bạn cần tạo file nginx.conf ở mục 3 bên dưới
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80
-EXPOSE 80
-
-# Chạy Nginx
-CMD ["nginx", "-g", "daemon off;"]
+COPY --chown=${OUTPUT_UID}:${OUTPUT_GID} --from=builder /app/build /
