@@ -19,6 +19,11 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                script {
+                    if (fileExists('.deployment-completed')) {
+                        deleteFile('.deployment-completed')
+                    }
+                }
                 checkout scm
             }
         }
@@ -145,6 +150,7 @@ ${env.BUILD_URL}
                 script {
                     deployReactApp()
                     env.DEPLOY_COMPLETED = 'true'
+                    writeFile file: '.deployment-completed', text: 'true\n'
                 }
             }
         }
@@ -220,7 +226,7 @@ def sendTelegram(status) {
             .replace('>', '&gt;')
             .replace('"', '&quot;')
     }
-    def deployment = env.DEPLOY_COMPLETED == 'true' ? 'Completed' : 'Not completed'
+    def deployment = fileExists('.deployment-completed') ? 'Completed' : 'Not completed'
     def message = """${statusIcon} <b>auth-fe pipeline</b>
 
 <b>Status:</b> <code>${escapeHtml(status)}</code>
